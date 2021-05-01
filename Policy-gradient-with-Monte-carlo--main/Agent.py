@@ -89,17 +89,18 @@ class Agent(object):
             i +=1
             
         R = 0
-        new_rewards = rewards
+        # G is a vector contains the ground truth return G_t(s,a) during the trajectory s,a,r, s_n, ............
+        G = rewards
         for i in range(len(rewards)-1, -1, -1):
             R = (rewards[i] + self.gamma * R)
-            new_rewards[i] = R
+            G[i] = R
             
-        #Normalize reward
-        reward_mean = np.mean(new_rewards)
-        reward_std  = np.std(new_rewards)
-        new_rewards = (new_rewards-reward_mean)/reward_std
+        #Normalize RETURN of the states 
+        G_mean = np.mean(new_rewards)
+        G_std  = np.std(new_rewards)
+        G      = (G-G_mean)/G_std
         
-        return states, actions, new_rewards
+        return states, actions, G
     
     
     
