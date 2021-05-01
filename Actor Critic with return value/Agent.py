@@ -56,12 +56,13 @@ class Agent(object):
         self.Critic.optimizer.zero_grad()
         
         states, actions, G = self.play_episode(env)
-        
+        actor_loss  = []
+        critic_loss = []
         for i in range(len(states)):
         
             state   = T.tensor(states[i], dtype=T.float).to(self.Actor.device)
             action  = T.tensor(actions[i]).to(self.Actor.device)
-            G       = T.tensor(G[i]).to(self.Actor.device)
+            G_s_a   = T.tensor(G[i]).to(self.Actor.device)
             
             # actor probabilities over state s 
             probs  = self.Actor(state)
@@ -70,17 +71,23 @@ class Agent(object):
             # critic evaluation of state s 
             s_pred  = self.Critic(state)
             
-            loss1 = -c.log_prob(action) * s_pred
-            loss1.backward()
+            advantage = (G_s_a - s_pred)
+            actor_loss.append(-c.log_prob(action) * advantage)
             
-            loss2     = self.Critic.loss(G,s_pred).to(self.eval_model.device)
-            loss2.backward()
-            
+            critic_loss.append(self.Critic.loss(G_s_a,s_pred).to(self.eval_model.device))
+        
+        actor_loss = torch.cat(actor_loss)
+        actor_loss = actor_loss.mean()
+        actor_loss.backward()
         self.Actor.optimizer.step()
+        
+        critic_loss = torch.cat(critic_loss)
+        critic_loss = critic_loss.mean()
+        critic_loss.backward()
         self.Critic.optimizer.step()
         self.decrement_epsilon()
             
-        return sum(rewards), len(rewards)
+        return sum(G), len(G)
         
     def play_episode(self, env):
     
