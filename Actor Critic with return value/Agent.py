@@ -55,22 +55,22 @@ class Agent(object):
         self.Actor.optimizer.zero_grad()
         self.Critic.optimizer.zero_grad()
         
-        states, actions, rewards = self.play_episode(env)
+        states, actions, G = self.play_episode(env)
         
         for i in range(len(states)):
         
             state   = T.tensor(states[i], dtype=T.float).to(self.Actor.device)
             action  = T.tensor(actions[i]).to(self.Actor.device)
-            reward  = T.tensor(rewards[i]).to(self.Actor.device)
+            G       = T.tensor(G[i]).to(self.Actor.device)
             
             probs  = self.Actor(state)
             c      = Categorical(probs)
             
-            loss = -c.log_prob(action) * reward
+            loss = -c.log_prob(action) * G
             loss.backward()
             
-            s_a_pred  = self.Critic(state)
-            loss2     = self.Critic.loss(reward,s_a_pred).to(self.eval_model.device)
+            s_a_pred  = self.Critic(state)[action]
+            loss2     = self.Critic.loss(G,s_a_pred).to(self.eval_model.device)
             loss2.backward()
             
         self.Actor.optimizer.step()
@@ -102,17 +102,17 @@ class Agent(object):
             i +=1
             
         R = 0
-        new_rewards = rewards
+        G = rewards
         for i in range(len(rewards)-1, -1, -1):
             R = (rewards[i] + self.gamma * R)
-            new_rewards[i] = R
+            G[i] = R
             
-        #Normalize reward
-        reward_mean = np.mean(new_rewards)
-        reward_std  = np.std(new_rewards)
-        new_rewards = (new_rewards-reward_mean)/reward_std
+        #Normalize RETURN of the states 
+        G_mean = np.mean(new_rewards)
+        G_std  = np.std(new_rewards)
+        G      = (G-G_mean)/G_std
         
-        return states, actions, new_rewards
+        return states, actions, G
     
     
     
