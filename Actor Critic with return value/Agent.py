@@ -25,7 +25,7 @@ class Agent(object):
         self.action_space = [i for i in range(self.n_actions)]
         
         self.Actor        = Actor(self.lr, self.n_actions, self.input_dim)
-        self.Critic       = Critic(self.lr, self.n_actions, self.input_dim)
+        self.Critic       = Critic(self.lr, 1, self.input_dim)
         
     def choose_action(self, state):
         self.Actor.eval()
