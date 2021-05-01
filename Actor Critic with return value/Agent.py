@@ -100,7 +100,7 @@ class Agent(object):
         actions   = []
         while (not done) or (i<self.max_iterations):
             
-            action,s_a_value = self.choose_action(state)
+            action,s_pred = self.choose_action(state)
             n_state, reward, done, info = env.step(action)
             
             states.append(state)
