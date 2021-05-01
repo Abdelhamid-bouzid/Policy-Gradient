@@ -63,14 +63,17 @@ class Agent(object):
             action  = T.tensor(actions[i]).to(self.Actor.device)
             G       = T.tensor(G[i]).to(self.Actor.device)
             
+            # actor probabilities over state s 
             probs  = self.Actor(state)
             c      = Categorical(probs)
             
-            loss = -c.log_prob(action) * G
-            loss.backward()
+            # critic evaluation of state s 
+            s_pred  = self.Critic(state)
             
-            s_a_pred  = self.Critic(state)[action]
-            loss2     = self.Critic.loss(G,s_a_pred).to(self.eval_model.device)
+            loss1 = -c.log_prob(action) * s_pred
+            loss1.backward()
+            
+            loss2     = self.Critic.loss(G,s_pred).to(self.eval_model.device)
             loss2.backward()
             
         self.Actor.optimizer.step()
