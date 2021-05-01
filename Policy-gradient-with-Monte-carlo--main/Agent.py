@@ -47,24 +47,27 @@ class Agent(object):
         
         self.Policy.optimizer.zero_grad()
         
-        states, actions, rewards = self.play_episode(env)
-        
+        states, actions, G = self.play_episode(env)
+        episod_loss = []
         for i in range(len(states)):
         
             state   = T.tensor(states[i], dtype=T.float).to(self.Policy.device)
             action  = T.tensor(actions[i]).to(self.Policy.device)
-            reward  = T.tensor(rewards[i]).to(self.Policy.device)
+            G_s_a   = T.tensor(G[i]).to(self.Policy.device)
             
             probs  = self.Policy(state)
             c      = Categorical(probs)
             
-            loss = -c.log_prob(action) * reward
-            loss.backward()
+            episod_loss.append(-c.log_prob(action) * G_s_a)
             
+        ####################################################### compute loss of the whole episode ##############################
+        episod_loss = torch.cat(episod_loss)
+        loss        = episod_loss.mean()
+        loss.backward()
         self.Policy.optimizer.step()
         self.decrement_epsilon()
             
-        return sum(rewards), len(rewards)
+        return sum(G), len(G)
         
     def play_episode(self, env):
     
