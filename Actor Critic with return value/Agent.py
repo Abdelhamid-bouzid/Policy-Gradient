@@ -105,6 +105,7 @@ class Agent(object):
             i +=1
             
         R = 0
+        # G is a vector contains the ground truth return G_t(s,a) during the trajectory s,a,r, s_n, ............
         G = rewards
         for i in range(len(rewards)-1, -1, -1):
             R = (rewards[i] + self.gamma * R)
