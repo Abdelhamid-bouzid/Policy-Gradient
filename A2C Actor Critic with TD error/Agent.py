@@ -29,22 +29,26 @@ class Agent():
             return
         self.actor_critic.optimizer.zero_grad()
 
-        state, prob, reward, new_state, done = self.memory.sample_buffer(self.batch_size)
+        state, actions, prob, reward, new_state, done = self.memory.sample_buffer(self.batch_size)
 
         states  = T.tensor(state).to(self.actor_critic.device)
+        actions = T.tensor(actions).to(self.actor_critic.device)
         probs   = T.tensor(prob).to(self.actor_critic.device)
         rewards = T.tensor(reward).to(self.actor_critic.device)
         dones   = T.tensor(done).to(self.actor_critic.device)
         states_ = T.tensor(new_state).to(self.actor_critic.device)
 
-        _, critic_value_ = self.actor_critic.forward(states_)
-        _, critic_value  = self.actor_critic.forward(states)
+        _, critic_value_    = self.actor_critic.forward(states_)
+        prob, critic_value  = self.actor_critic.forward(states)
+        probabilities    = F.softmax(prob)
+        action_probs     = T.distributions.Categorical(probabilities)
+        log_probs        = action_probs.log_prob(actions)
 
         critic_value_[dones] = 0.0
 
         delta = rewards + self.gamma*critic_value_ - critic_value
 
-        actor_loss  = -T.mean(probs*delta)
+        actor_loss  = -T.mean(log_probs*delta)
         critic_loss = F.mse_loss(rewards + self.gamma*critic_value_, critic_value)
 
         (actor_loss + critic_loss).backward()
