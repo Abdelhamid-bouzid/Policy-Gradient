@@ -4,4 +4,4 @@ This contribution of this paper is about using (GENERALIZED ADVANTAGE ESTIMATION
 
 # The implementation pipeline:
 The following figure displays the pipeline of the implementation of the GAE framework.
-![Image](Pipline.JPG)
+![Image](Pipeline.JPG)
