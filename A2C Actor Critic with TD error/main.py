@@ -33,7 +33,7 @@ if __name__ == '__main__':
             action, log_prob = agent.choose_action(state)
             n_state, reward, done, info = env.step(action)
             
-            agent.store_transitions(state, log_prob, reward , n_state, int(done))
+            agent.store_transitions(state, action, log_prob, reward , n_state, int(done))
             agent.learn()
             
             state    = n_state
