@@ -5,4 +5,6 @@ This contribution of this paper is about minimizing the effects of overestimatio
 # Overestimation of a state is:
 the highly estimation of the state value (too highly than what actually is)
 
+# The implementation pipeline:
+The following figure displays the pipeline of the implementation of the TD3 framework.
 ![Image](Pipline.JPG)
