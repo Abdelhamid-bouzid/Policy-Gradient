@@ -38,7 +38,7 @@ class Agent():
         states_ = T.tensor(new_state).to(self.actor_critic.device)
 
         _, critic_value_ = self.actor_critic.forward(states_)
-        probs, critic_value  = self.actor_critic.forward(states)
+        _, critic_value  = self.actor_critic.forward(states)
 
         critic_value_[dones] = 0.0
 
