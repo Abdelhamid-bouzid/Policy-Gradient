@@ -3,5 +3,5 @@ This folder contains the implementation of paper entitled "HIGH-DIMENSIONAL CONT
 This contribution of this paper is about using (GENERALIZED ADVANTAGE ESTIMATION (GAE)) in problems of HIGH-DIMENSIONAL CONTINUOUS CONTROL (problems that require continious control through all the episode).
 
 # The implementation pipeline:
-The following figure displays the pipeline of the implementation of the TD3 framework.
+The following figure displays the pipeline of the implementation of the GAE framework.
 ![Image](Pipline.JPG)
