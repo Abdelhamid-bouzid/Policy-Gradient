@@ -3,4 +3,4 @@ This folder contains the implementation of paper entitled "Soft Actor-Critic: Of
 
 # The implementation pipeline:
 The following figure displays the pipeline of the implementation of the SAC framework.
-![Image](pipline.JPG)
+![Image](pipeline.JPG)
